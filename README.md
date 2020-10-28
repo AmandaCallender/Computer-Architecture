@@ -1,4 +1,4 @@
-# Computer Architecture
+# Computer Architecture - Amanda Callender
 
 ## Project
 

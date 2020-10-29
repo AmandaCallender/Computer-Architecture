@@ -7,28 +7,60 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.ram = [0] * 256
+        self.reg = [0] * 8
+        self.reg[7] = 0xF4
+        self.pc = 0
+        self.halted = False
+        self.sp = 7
 
     def load(self):
         """Load a program into memory."""
 
-        address = 0
+        # address = 0
 
-        # For now, we've just hardcoded a program:
+        # # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
+
+        if len(sys.argv) != 2:
+            print('Invalid number of args')
+            sys.exit(1)
+
+        try:
+            with open(f"examples/{sys.argv[1]}") as f:
+                address = 0
+                for line in f:
+                    comment_split = line.split("#")
+                    num = comment_split[0].strip()
+                    try:
+                        instruction = int(num,2)
+                        self.ram_write(instruction, address)
+                        address += 1
+                    except:
+                        continue
+                self.reg[self.sp] = len(self.ram) - 1
+        except:
+            print("File not found")
+            sys.exit(1)
+    
+    def ram_read(self, mar):
+        return self.ram[mar]
+
+    def ram_write(self, mdr, mar):
+        self.ram[mar] = mdr
 
 
     def alu(self, op, reg_a, reg_b):
@@ -62,4 +94,20 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        
+        def unknown_command(*argv):
+            print("Command is unknown. Run away!")
+            sys.exit(1)
+
+        def HLT(*argv):
+            self.halted = True
+
+        def LDI(operand_a, operand_b):
+            self.reg[operand_a] = operand_b
+            self.pc += 2
+
+        def PRN(*argv):
+            print(self.reg[self.ram_read(self.pc+1)])
+            self.pc += 1
+
+        

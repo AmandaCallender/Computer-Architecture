@@ -110,4 +110,20 @@ class CPU:
             print(self.reg[self.ram_read(self.pc+1)])
             self.pc += 1
 
+        def MUL(operand_a, operand_b):
+            self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
+            self.pc += 2
+
+        def PUSH(operand_a, operand_b):
+            self.reg[self.sp] -= 1
+            stack_address = self.reg[self.sp]
+            self.ram_write(self.reg[operand_a], stack_address)
+            self.pc += 1
+
+        def POP(operand_a, operand_b):
+            stack_address = self.reg[self.sp]
+            stack_top_val = self.ram_read(stack_address)
+            self.reg[operand_a] =  stack_top_val
+            self.reg[self.sp] += 1
+            self.pc += 1
         
